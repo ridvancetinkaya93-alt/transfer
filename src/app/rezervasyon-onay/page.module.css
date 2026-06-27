@@ -1,0 +1,216 @@
+.main {
+  padding-top: var(--nav-height);
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, rgba(186,0,54,0.03) 0%, var(--color-surface) 60%);
+  position: relative;
+  overflow: hidden;
+}
+
+/* Confetti */
+.confettiWrap {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.confetti {
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  top: -20px;
+  border-radius: 2px;
+  animation: confetti-fall 3s linear infinite;
+}
+
+/* Content */
+.content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-8);
+  max-width: 560px;
+  width: 100%;
+  padding: var(--space-8) var(--space-5);
+  text-align: center;
+  position: relative;
+  z-index: 1;
+}
+
+/* Check Circle */
+.checkCircle {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  background: var(--gradient-primary);
+  box-shadow: 0 16px 48px rgba(186,0,54,0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transform: scale(0);
+  opacity: 0;
+  transition: transform 0.6s var(--ease-out-expo), opacity 0.4s;
+}
+
+.checkVisible {
+  transform: scale(1);
+  opacity: 1;
+}
+
+.checkSvg {
+  width: 52px;
+  height: 52px;
+}
+
+.checkPath {
+  stroke-dasharray: 60;
+  stroke-dashoffset: 60;
+  animation: drawCheck 0.5s var(--ease-out-expo) 0.4s forwards;
+}
+
+/* Text */
+.textContent {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  opacity: 0;
+  transform: translateY(20px);
+  transition: all 0.5s var(--ease-out-expo) 0.3s;
+}
+
+.textVisible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.title {
+  font-family: var(--font-headline);
+  font-size: clamp(1.75rem, 4vw, 2.5rem);
+  font-weight: 800;
+  color: var(--color-on-surface);
+  letter-spacing: -0.03em;
+}
+
+.subtitle {
+  font-size: var(--text-base);
+  color: var(--color-secondary);
+  line-height: 1.7;
+  max-width: 400px;
+  margin: 0 auto;
+}
+
+/* Code Card */
+.codeCard {
+  background: var(--color-surface-white);
+  border: 2px dashed rgba(186,0,54,0.25);
+  border-radius: var(--radius-xl);
+  padding: var(--space-8);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-3);
+  width: 100%;
+  opacity: 0;
+  transform: translateY(20px);
+  transition: all 0.5s var(--ease-out-expo) 0.5s;
+}
+
+.codeVisible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.codeLabel {
+  font-size: var(--text-xs);
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--color-secondary);
+}
+
+.codeDisplay {
+  font-family: 'Courier New', monospace;
+  font-size: clamp(1.25rem, 4vw, 1.75rem);
+  font-weight: 900;
+  color: var(--color-primary);
+  letter-spacing: 0.12em;
+  background: rgba(186,0,54,0.06);
+  padding: var(--space-4) var(--space-8);
+  border-radius: var(--radius-md);
+}
+
+.codeNote {
+  font-size: var(--text-xs);
+  color: var(--color-secondary);
+}
+
+.copyBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin-top: var(--space-2);
+  padding: var(--space-2) var(--space-4);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  color: var(--color-primary);
+  background: rgba(186, 0, 54, 0.08);
+  border: 1px solid rgba(186, 0, 54, 0.15);
+  border-radius: var(--radius-full);
+  cursor: pointer;
+  transition: all var(--duration-base);
+}
+
+.copyBtn:hover {
+  background: rgba(186, 0, 54, 0.12);
+}
+
+/* Total */
+.totalCard {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  background: var(--color-surface-low);
+  border-radius: var(--radius-md);
+  padding: var(--space-4) var(--space-6);
+  opacity: 0;
+  transform: translateY(20px);
+  transition: all 0.5s var(--ease-out-expo) 0.65s;
+}
+
+.totalVisible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.totalLabel {
+  font-size: var(--text-sm);
+  color: var(--color-secondary);
+  font-weight: 500;
+}
+
+.totalAmount {
+  font-family: var(--font-headline);
+  font-size: var(--text-xl);
+  font-weight: 800;
+  color: var(--color-on-surface);
+  letter-spacing: -0.02em;
+}
+
+/* Actions */
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  justify-content: center;
+  opacity: 0;
+  transform: translateY(20px);
+  transition: all 0.5s var(--ease-out-expo) 0.8s;
+}
+
+.actionsVisible {
+  opacity: 1;
+  transform: translateY(0);
+}
