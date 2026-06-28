@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import { redirect } from 'next/navigation';
-import { cookies } from 'next/headers';
+import { isAdminAuthenticated } from '@/lib/auth/admin';
 import AdminDashboard from './AdminDashboard';
 
 export const metadata: Metadata = {
@@ -10,11 +10,7 @@ export const metadata: Metadata = {
 };
 
 export default async function AdminDashboardPage() {
-  // Check auth cookie
-  const cookieStore = await cookies();
-  const session = cookieStore.get('admin_session');
-
-  if (!session || session.value !== 'authenticated') {
+  if (!(await isAdminAuthenticated())) {
     redirect('/admin/login');
   }
 

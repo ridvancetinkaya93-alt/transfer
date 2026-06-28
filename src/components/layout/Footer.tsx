@@ -1,6 +1,6 @@
 import Link from 'next/link';
-import Image from 'next/image';
 import { siteConfig, telLink, whatsappLink } from '@/lib/site-config';
+import PaymentLogos from '@/components/ui/PaymentLogos';
 import styles from './Footer.module.css';
 
 const services = [
@@ -133,27 +133,7 @@ export default function Footer() {
             <div className={styles.paymentPartners}>
               <span className={styles.paymentPartnersLabel}>Güvenli Ödeme Ortakları</span>
               <div className={styles.paymentLogos}>
-                <Image
-                  src="/payments/iyzico-ile-ode.svg"
-                  alt="iyzico ile Öde"
-                  width={140}
-                  height={32}
-                  className={styles.paymentLogo}
-                />
-                <Image
-                  src="/payments/visa.svg"
-                  alt="Visa"
-                  width={48}
-                  height={16}
-                  className={styles.paymentLogo}
-                />
-                <Image
-                  src="/payments/mastercard.svg"
-                  alt="Mastercard"
-                  width={32}
-                  height={20}
-                  className={styles.paymentLogo}
-                />
+                <PaymentLogos variant="footer" />
                 <div className={styles.paymentBadge}>
                   <span className="material-symbols-outlined icon-filled" style={{fontSize:'16px', color:'var(--color-success)'}}>lock</span>
                   SSL 256-bit

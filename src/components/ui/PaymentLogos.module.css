@@ -1,0 +1,50 @@
+.footer {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  flex-wrap: wrap;
+}
+
+.paymentPage {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+}
+
+.iyzicoBadge,
+.visaBadge,
+.mcBadge {
+  display: flex;
+  align-items: center;
+  line-height: 0;
+}
+
+.iyzicoSvg {
+  width: 110px;
+  height: auto;
+  display: block;
+}
+
+.visaSvg {
+  width: 52px;
+  height: auto;
+  display: block;
+}
+
+.mcSvg {
+  width: 44px;
+  height: auto;
+  display: block;
+}
+
+.paymentPage .iyzicoSvg {
+  width: 130px;
+}
+
+.paymentPage .visaSvg {
+  width: 56px;
+}
+
+.paymentPage .mcSvg {
+  width: 48px;
+}

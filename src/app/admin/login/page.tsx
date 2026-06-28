@@ -27,6 +27,7 @@ export default function AdminLoginPage() {
 
       if (res.ok) {
         router.push('/admin/dashboard');
+        router.refresh();
       } else {
         setError(data.error || 'Geçersiz kullanıcı adı veya şifre.');
       }
@@ -57,7 +58,9 @@ export default function AdminLoginPage() {
         <div className={styles.divider} />
 
         <h2 className={styles.title}>Giriş Yap</h2>
-        <p className={styles.subtitle}>Yönetim paneline erişmek için bilgilerinizi girin.</p>
+        <p className={styles.subtitle}>
+          Supabase hesabınızla giriş yapın. Admin yetkisi için <code>profiles.is_admin = true</code> gerekir.
+        </p>
 
         <form onSubmit={handleLogin} className={styles.form}>
           {error && (

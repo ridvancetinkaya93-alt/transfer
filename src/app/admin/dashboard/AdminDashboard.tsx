@@ -99,6 +99,7 @@ export default function AdminDashboard() {
   const handleLogout = async () => {
     await fetch('/api/admin/logout', { method: 'POST' });
     router.push('/admin/login');
+    router.refresh();
   };
 
   const handleReservationStatus = async (id: string, status: ReservationStatus) => {

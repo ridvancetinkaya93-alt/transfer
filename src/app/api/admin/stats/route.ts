@@ -1,14 +1,15 @@
 import { NextResponse } from 'next/server';
-import { cookies } from 'next/headers';
+import { requireAdmin } from '@/lib/auth/admin';
 import { getAllReservations } from '@/lib/db/reservations';
 import { getVillas } from '@/lib/db/villas';
 
 export async function GET() {
-  const cookieStore = await cookies();
-  const session = cookieStore.get('admin_session');
-
-  if (session?.value !== 'authenticated') {
-    return NextResponse.json({ error: 'Yetkisiz erişim.' }, { status: 401 });
+  try {
+    await requireAdmin();
+  } catch (err) {
+    const message = err instanceof Error ? err.message : 'Yetkisiz erişim.';
+    const status = message === 'Oturum gerekli.' ? 401 : 403;
+    return NextResponse.json({ error: message }, { status });
   }
 
   const [reservations, villas] = await Promise.all([getAllReservations(), getVillas({})]);

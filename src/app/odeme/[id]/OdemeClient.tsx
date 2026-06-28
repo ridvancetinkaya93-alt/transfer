@@ -1,10 +1,10 @@
 'use client';
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import Image from 'next/image';
 import Link from 'next/link';
 import type { Reservation, SavedCard } from '@/types/database';
 import { formatPriceShort } from '@/lib/utils';
+import PaymentLogos from '@/components/ui/PaymentLogos';
 import styles from './page.module.css';
 
 interface Props {
@@ -98,11 +98,7 @@ export default function OdemeClient({ reservation }: Props) {
           <div className={styles.formArea}>
             <div className={styles.formCard}>
               <div className={styles.iyzicoBanner}>
-                <Image src="/payments/iyzico-ile-ode.svg" alt="iyzico ile Öde" width={140} height={32} />
-                <div className={styles.cardLogos}>
-                  <Image src="/payments/visa.svg" alt="Visa" width={40} height={14} />
-                  <Image src="/payments/mastercard.svg" alt="Mastercard" width={28} height={18} />
-                </div>
+                <PaymentLogos variant="payment" />
               </div>
 
               {authenticated && savedCards.length > 0 && (

@@ -1,39 +1,43 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { setAdminSessionCookie } from '@/lib/auth/admin-session';
+import { NextResponse } from 'next/server';
+import { createSupabaseServerClient } from '@/lib/supabase/ssr-server';
+import { customerLoginSchema } from '@/lib/validation/schemas';
+import { isUserAdmin } from '@/lib/auth/admin-check';
 
-const ADMIN_EMAIL = process.env.ADMIN_EMAIL || 'admin@rcetinkayaturizm.com';
-const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'admin123';
-
-export async function POST(request: NextRequest) {
+export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const { email, password } = body;
+    const parsed = customerLoginSchema.safeParse(body);
 
-    if (!email || !password) {
+    if (!parsed.success) {
       return NextResponse.json(
-        { error: 'E-posta ve şifre zorunludur.' },
+        { error: parsed.error.issues[0]?.message || 'Geçersiz form.' },
         { status: 400 }
       );
     }
 
-    if (email !== ADMIN_EMAIL || password !== ADMIN_PASSWORD) {
+    const { email, password } = parsed.data;
+    const supabase = await createSupabaseServerClient();
+
+    const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+    if (error) {
+      return NextResponse.json({ error: 'E-posta veya şifre hatalı.' }, { status: 401 });
+    }
+
+    if (!data.user) {
+      return NextResponse.json({ error: 'Giriş başarısız.' }, { status: 401 });
+    }
+
+    const admin = await isUserAdmin(supabase, data.user.id);
+    if (!admin) {
+      await supabase.auth.signOut();
       return NextResponse.json(
-        { error: 'Geçersiz kullanıcı adı veya şifre.' },
-        { status: 401 }
+        { error: 'Bu hesabın admin yetkisi yok. Supabase profiles.is_admin = true gerekli.' },
+        { status: 403 }
       );
     }
 
-    await setAdminSessionCookie();
-
-    return NextResponse.json(
-      { success: true, message: 'Giriş başarılı.' },
-      { status: 200 }
-    );
-  } catch (error) {
-    console.error('Admin login error:', error);
-    return NextResponse.json(
-      { error: 'Sunucu hatası.' },
-      { status: 500 }
-    );
+    return NextResponse.json({ success: true });
+  } catch {
+    return NextResponse.json({ error: 'Giriş işlemi başarısız.' }, { status: 500 });
   }
 }
