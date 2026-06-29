@@ -4,12 +4,14 @@ import styles from './page.module.css';
 
 export const metadata: Metadata = {
   title: 'Hakkımızda & Yasal Bilgiler',
-  description: 'RCetinkaya Turizm hakkında bilgi, KVKK aydınlatma metni, kullanım koşulları ve iptal politikası.',
+  description: 'RCetinkaya Turizm hakkında bilgi, gizlilik sözleşmesi, KVKK, teslimat ve iade şartları, mesafeli satış sözleşmesi.',
 };
 
 const sections = [
   { id: 'hakkimizda', title: 'Hakkımızda' },
+  { id: 'gizlilik', title: 'Gizlilik Sözleşmesi' },
   { id: 'kvkk', title: 'KVKK Aydınlatma Metni' },
+  { id: 'teslimat-iade', title: 'Teslimat ve İade Şartları' },
   { id: 'kullanim', title: 'Kullanım Koşulları' },
   { id: 'iptal', title: 'İptal Politikası' },
   { id: 'mesafeli', title: 'Mesafeli Satış Sözleşmesi' },
@@ -68,6 +70,44 @@ export default function HakkimizdaPage() {
               </div>
             </article>
 
+            <article id="gizlilik" className={styles.section}>
+              <h2>Gizlilik Sözleşmesi</h2>
+              <p>
+                RCetinkaya Turizm (&quot;Şirket&quot;) olarak, <strong>rcetinkayaturizm.com</strong> web sitesini ziyaret eden
+                ve hizmetlerimizi kullanan kişilerin gizliliğini korumayı taahhüt ederiz. Bu Gizlilik Sözleşmesi,
+                hangi verilerin toplandığını, nasıl kullanıldığını ve korunduğunu açıklar.
+              </p>
+              <h3>Toplanan Veriler</h3>
+              <ul>
+                <li>Rezervasyon ve iletişim formlarında paylaştığınız ad, soyad, e-posta, telefon ve kimlik bilgileri</li>
+                <li>Ödeme işlemlerinde kart bilgileri doğrudan bizde saklanmaz; iyzico güvenli ödeme altyapısı kullanılır</li>
+                <li>Site kullanımına ilişkin teknik loglar (IP adresi, tarayıcı bilgisi, oturum çerezleri)</li>
+              </ul>
+              <h3>Verilerin Kullanım Amacı</h3>
+              <ul>
+                <li>Rezervasyon ve transfer taleplerinin işlenmesi ve müşteri desteği</li>
+                <li>Ödeme alınması ve yasal yükümlülüklerin yerine getirilmesi</li>
+                <li>Hizmet kalitesinin artırılması ve güvenliğin sağlanması</li>
+              </ul>
+              <h3>Verilerin Paylaşımı</h3>
+              <p>
+                Kişisel verileriniz yalnızca hizmetin ifası için gerekli taraflarla (ödeme kuruluşu, villa sahibi,
+                transfer operatörü) ve yasal zorunluluk halinde yetkili kamu kurumlarıyla paylaşılabilir.
+                Verileriniz ticari amaçla üçüncü taraflara satılmaz.
+              </p>
+              <h3>Çerezler</h3>
+              <p>
+                Sitemiz oturum yönetimi ve güvenlik için zorunlu çerezler kullanır. Tarayıcı ayarlarından çerezleri
+                yönetebilirsiniz; bazı özellikler çerezler devre dışı bırakıldığında çalışmayabilir.
+              </p>
+              <h3>Haklarınız</h3>
+              <p>
+                KVKK kapsamındaki haklarınız için <a href="mailto:info@rcetinkayaturizm.com">info@rcetinkayaturizm.com</a>
+                adresine başvurabilirsiniz. Detaylı bilgi için{' '}
+                <a href="#kvkk">KVKK Aydınlatma Metni</a> bölümüne bakınız.
+              </p>
+            </article>
+
             <article id="kvkk" className={styles.section}>
               <h2>KVKK Aydınlatma Metni</h2>
               <p>
@@ -81,6 +121,36 @@ export default function HakkimizdaPage() {
                 <li>KVKK kapsamındaki haklarınız için <a href="mailto:info@rcetinkayaturizm.com">info@rcetinkayaturizm.com</a> adresine başvurabilirsiniz.</li>
                 <li>Verileriniz Türkiye Cumhuriyeti sınırları içinde güvenli sunucularda saklanır.</li>
               </ul>
+            </article>
+
+            <article id="teslimat-iade" className={styles.section}>
+              <h2>Teslimat ve İade Şartları</h2>
+              <p>
+                RCetinkaya Turizm üzerinden satın alılan villa kiralama ve VIP transfer hizmetlerinin teslimat ve
+                iade koşulları aşağıda belirtilmiştir.
+              </p>
+              <h3>Teslimat (Hizmetin İfası)</h3>
+              <ul>
+                <li><strong>Villa kiralama:</strong> Rezervasyon onayı ve ödeme tamamlandıktan sonra, belirtilen giriş (check-in) tarihinde ve saatinde villa misafire teslim edilir. Giriş bilgileri e-posta ile paylaşılır.</li>
+                <li><strong>VIP transfer:</strong> Talep formunda belirtilen tarih, saat ve adreste araç teslimi yapılır. Operasyon ekibimiz transfer öncesinde telefon ile teyit alır.</li>
+                <li><strong>Ek hizmetler</strong> (şef, temizlik vb.): Rezervasyonda onaylanan gün ve saatte villa adresinde sunulur.</li>
+                <li>Fiziksel ürün satışı yapılmadığından kargo teslimatı söz konusu değildir; hizmet dijital olarak onaylanır ve sahada ifa edilir.</li>
+              </ul>
+              <h3>İade ve Cayma</h3>
+              <ul>
+                <li>Villa rezervasyonları için iptal ve iade koşulları <a href="#iptal">İptal Politikası</a> bölümünde detaylandırılmıştır.</li>
+                <li><strong>Giriş tarihinden 30+ gün önce iptal:</strong> Tam iade (hizmet bedeli hariç)</li>
+                <li><strong>15–29 gün önce:</strong> Toplam tutarın %50 iadesi</li>
+                <li><strong>14 gün ve altı:</strong> İade yapılmaz</li>
+                <li>Ödeme havale ile yapıldıysa iade, onay sonrası 14 iş günü içinde aynı hesaba yapılır.</li>
+                <li>Kredi kartı ödemelerinde iade, banka süreçlerine bağlı olarak 7–14 iş günü içinde kartınıza yansır.</li>
+              </ul>
+              <h3>İade Talebi</h3>
+              <p>
+                İade ve iptal taleplerinizi <Link href="/iletisim">iletişim formu</Link>, e-posta (
+                <a href="mailto:info@rcetinkayaturizm.com">info@rcetinkayaturizm.com</a>) veya WhatsApp üzerinden
+                rezervasyon kodunuzla iletebilirsiniz. Talepler en geç 2 iş günü içinde yanıtlanır.
+              </p>
             </article>
 
             <article id="kullanim" className={styles.section}>
