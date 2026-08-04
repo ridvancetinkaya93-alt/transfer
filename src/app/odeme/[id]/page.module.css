@@ -442,3 +442,60 @@
   width: 18px;
   height: 18px;
 }
+
+.formSectionTitle {
+  font-family: var(--font-headline);
+  font-size: var(--text-base);
+  font-weight: 700;
+  color: var(--color-on-surface);
+  margin-bottom: var(--space-2);
+}
+
+.cardFormFields {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.checkoutLoading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-3);
+  padding: var(--space-6);
+  font-size: var(--text-sm);
+  color: var(--color-secondary);
+  background: var(--color-surface-low);
+  border-radius: var(--radius-md);
+}
+
+.devModeNote {
+  font-size: var(--text-xs);
+  color: var(--color-secondary);
+  background: rgba(0, 106, 69, 0.06);
+  border: 1px solid rgba(0, 106, 69, 0.15);
+  border-radius: var(--radius-md);
+  padding: var(--space-3) var(--space-4);
+  line-height: 1.6;
+}
+
+.iyzicoCheckout {
+  display: none;
+  min-height: 0;
+}
+
+.iyzicoCheckoutVisible {
+  display: block;
+  margin: var(--space-4) 0;
+  padding: var(--space-4);
+  background: var(--color-surface-low);
+  border-radius: var(--radius-lg);
+  border: 1px solid rgba(229, 189, 190, 0.2);
+}
+
+.iyzicoEmbedNote {
+  font-size: var(--text-sm);
+  color: var(--color-secondary);
+  text-align: center;
+  line-height: 1.6;
+}
