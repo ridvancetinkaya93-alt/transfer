@@ -183,10 +183,11 @@ export default function ReservasyonClient({ villa }: Props) {
 
                 <div className={styles.dateRow}>
                   <div className={styles.dateField}>
-                    <label className={styles.fieldLabel}>Giriş Tarihi</label>
+                    <label className={styles.fieldLabel} htmlFor="rez-checkin">Giriş Tarihi</label>
                     <div className={styles.fieldWrap}>
-                      <span className="material-symbols-outlined" style={{color:'var(--color-primary)'}}>calendar_today</span>
+                      <span className="material-symbols-outlined" style={{color:'var(--color-primary)'}} aria-hidden>calendar_today</span>
                       <input
+                        id="rez-checkin"
                         type="date"
                         className="input"
                         value={checkIn}
@@ -196,10 +197,11 @@ export default function ReservasyonClient({ villa }: Props) {
                     </div>
                   </div>
                   <div className={styles.dateField}>
-                    <label className={styles.fieldLabel}>Çıkış Tarihi</label>
+                    <label className={styles.fieldLabel} htmlFor="rez-checkout">Çıkış Tarihi</label>
                     <div className={styles.fieldWrap}>
-                      <span className="material-symbols-outlined" style={{color:'var(--color-primary)'}}>calendar_month</span>
+                      <span className="material-symbols-outlined" style={{color:'var(--color-primary)'}} aria-hidden>calendar_month</span>
                       <input
+                        id="rez-checkout"
                         type="date"
                         className="input"
                         value={checkOut}

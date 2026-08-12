@@ -57,10 +57,11 @@ export default function SearchBar() {
         <div className={styles.divider} />
 
         <div className={styles.field}>
-          <label className={styles.label}>Giriş Tarihi</label>
+          <label className={styles.label} htmlFor="search-checkin">Giriş Tarihi</label>
           <div className={styles.inputWrap}>
-            <span className="material-symbols-outlined" style={{color:'var(--color-primary)', fontSize:'20px'}}>calendar_today</span>
+            <span className="material-symbols-outlined" style={{color:'var(--color-primary)', fontSize:'20px'}} aria-hidden>calendar_today</span>
             <input
+              id="search-checkin"
               type="date"
               className={styles.dateInput}
               value={checkIn}
@@ -78,10 +79,11 @@ export default function SearchBar() {
         <div className={styles.divider} />
 
         <div className={styles.field}>
-          <label className={styles.label}>Çıkış Tarihi</label>
+          <label className={styles.label} htmlFor="search-checkout">Çıkış Tarihi</label>
           <div className={styles.inputWrap}>
-            <span className="material-symbols-outlined" style={{color:'var(--color-primary)', fontSize:'20px'}}>calendar_month</span>
+            <span className="material-symbols-outlined" style={{color:'var(--color-primary)', fontSize:'20px'}} aria-hidden>calendar_month</span>
             <input
+              id="search-checkout"
               type="date"
               className={styles.dateInput}
               value={checkOut}

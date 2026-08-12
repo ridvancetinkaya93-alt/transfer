@@ -11,7 +11,7 @@
   backdrop-filter: blur(20px);
   border-radius: var(--radius-2xl);
   box-shadow: 0 24px 60px rgba(0,0,0,0.2), 0 8px 24px rgba(186,0,54,0.08);
-  overflow: hidden;
+  overflow: visible;
   padding: var(--space-2);
   gap: 0;
 }
@@ -19,8 +19,8 @@
 @media (max-width: 768px) {
   .bar {
     flex-direction: column;
-    padding: var(--space-4);
-    gap: var(--space-1);
+    padding: var(--space-3);
+    gap: var(--space-2);
     border-radius: var(--radius-xl);
   }
 }
@@ -43,11 +43,9 @@
 @media (max-width: 768px) {
   .field {
     width: 100%;
-    padding: var(--space-3) var(--space-4);
+    padding: var(--space-3) var(--space-3);
     border-radius: var(--radius-md);
-    flex-direction: row;
-    align-items: center;
-    gap: var(--space-3);
+    background: var(--color-surface-low);
   }
 }
 
@@ -61,21 +59,16 @@
   display: block;
 }
 
-@media (max-width: 768px) {
-  .label {
-    margin-bottom: 0;
-    width: 80px;
-    flex-shrink: 0;
-  }
-}
-
 .inputWrap {
   display: flex;
   align-items: center;
   gap: var(--space-2);
+  width: 100%;
+  min-width: 0;
+  position: relative;
 }
 
-.select, .dateInput {
+.select {
   background: transparent;
   border: none;
   outline: none;
@@ -86,13 +79,35 @@
   cursor: pointer;
   width: 100%;
   min-width: 0;
+  flex: 1;
   appearance: none;
   -webkit-appearance: none;
+  padding: 0.25rem 0;
+}
+
+.dateInput {
+  background: transparent;
+  border: none;
+  outline: none;
+  font-family: var(--font-headline);
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--color-on-surface);
+  cursor: pointer;
+  width: 100%;
+  min-width: 0;
+  flex: 1;
+  min-height: 44px;
+  padding: 0.25rem 0;
+  color-scheme: light;
+  /* appearance: none kaldırıldı — iOS date picker’ı bozuyordu */
 }
 
 @media (min-width: 769px) {
-  .select, .dateInput {
+  .select,
+  .dateInput {
     font-size: var(--text-sm);
+    min-height: auto;
   }
 }
 
@@ -101,11 +116,24 @@
   background: white;
 }
 
+/* Takvim ikonu görünür ve tıklanabilir (mobilde gizli değildi / yazı görünmüyordu) */
 .dateInput::-webkit-calendar-picker-indicator {
-  opacity: 0;
-  position: absolute;
-  width: 100%;
+  opacity: 1;
   cursor: pointer;
+  width: 22px;
+  height: 22px;
+  padding: 0;
+  margin-left: auto;
+}
+
+.dateInput:invalid,
+.dateInput:not(:focus):placeholder-shown {
+  color: var(--color-secondary);
+}
+
+.dateInput:not([value]):not(:focus),
+.dateInput[value=''] {
+  color: var(--color-secondary);
 }
 
 .divider {
@@ -118,9 +146,7 @@
 
 @media (max-width: 768px) {
   .divider {
-    width: 100%;
-    height: 1px;
-    opacity: 0.3;
+    display: none;
   }
 }
 
@@ -157,8 +183,9 @@
     width: 100%;
     justify-content: center;
     padding: 1rem;
-    margin-top: var(--space-2);
+    margin-top: var(--space-1);
     border-radius: var(--radius-md);
+    min-height: 48px;
   }
 }
 

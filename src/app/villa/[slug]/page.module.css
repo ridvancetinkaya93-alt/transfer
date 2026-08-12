@@ -555,11 +555,30 @@
   border: none;
   outline: none;
   font-family: var(--font-headline);
-  font-size: var(--text-sm);
+  font-size: 16px;
   font-weight: 600;
   color: var(--color-on-surface);
   width: 100%;
+  min-width: 0;
+  min-height: 40px;
   cursor: pointer;
+  color-scheme: light;
+  -webkit-appearance: auto;
+  appearance: auto;
+}
+
+.dateInput::-webkit-calendar-picker-indicator {
+  opacity: 1;
+  cursor: pointer;
+  width: 20px;
+  height: 20px;
+}
+
+@media (max-width: 640px) {
+  .dateGrid {
+    grid-template-columns: 1fr;
+    margin: var(--space-4);
+  }
 }
 
 /* Guest Stepper */
