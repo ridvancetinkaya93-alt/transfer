@@ -48,3 +48,27 @@
 .paymentPage .mcSvg {
   width: 48px;
 }
+
+@media (max-width: 480px) {
+  .paymentPage {
+    gap: var(--space-3);
+    justify-content: center;
+    width: 100%;
+  }
+
+  .paymentPage .iyzicoSvg {
+    width: 96px;
+  }
+
+  .paymentPage .visaSvg {
+    width: 44px;
+  }
+
+  .paymentPage .mcSvg {
+    width: 38px;
+  }
+
+  .iyzicoSvg {
+    width: 90px;
+  }
+}

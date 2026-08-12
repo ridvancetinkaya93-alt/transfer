@@ -60,6 +60,31 @@
   box-shadow: var(--shadow-ambient);
 }
 
+@media (max-width: 640px) {
+  .main {
+    padding-top: calc(var(--nav-height) + var(--space-6));
+    padding-bottom: var(--space-10);
+  }
+
+  .hero {
+    margin-bottom: var(--space-6);
+  }
+
+  .card,
+  .aside {
+    padding: var(--space-5);
+  }
+
+  .iyzicoBanner {
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  .priceRow strong {
+    font-size: var(--text-xl);
+  }
+}
+
 .productHeader {
   display: flex;
   align-items: flex-start;

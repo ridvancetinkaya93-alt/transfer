@@ -2,6 +2,14 @@
   padding-top: calc(var(--nav-height) + var(--space-10));
   padding-bottom: var(--space-16);
   min-height: 100vh;
+  overflow-x: hidden;
+}
+
+@media (max-width: 640px) {
+  .main {
+    padding-top: calc(var(--nav-height) + var(--space-6));
+    padding-bottom: var(--space-10);
+  }
 }
 
 .header {
@@ -51,9 +59,29 @@
 /* Card Visual */
 .cardVisualWrap {
   perspective: 1200px;
-  cursor: pointer;
   margin-bottom: var(--space-2);
   user-select: none;
+  pointer-events: none;
+}
+
+@media (max-width: 640px) {
+  .cardVisualWrap {
+    max-width: 100%;
+  }
+
+  .cardVisual {
+    max-width: 100%;
+  }
+
+  .cardNumber {
+    font-size: 0.95rem;
+    letter-spacing: 0.12em;
+  }
+
+  .cardBottom {
+    gap: var(--space-3);
+    flex-wrap: wrap;
+  }
 }
 
 .cardVisual {
@@ -207,10 +235,19 @@
   gap: var(--space-5);
 }
 
+@media (max-width: 640px) {
+  .formCard {
+    padding: var(--space-5);
+    border-radius: var(--radius-lg);
+    gap: var(--space-4);
+  }
+}
+
 .fieldGroup {
   display: flex;
   flex-direction: column;
   gap: var(--space-2);
+  min-width: 0;
 }
 
 .fieldLabel {
@@ -228,14 +265,48 @@
   background: var(--color-surface-low);
   border-radius: var(--radius-md);
   padding: 0 var(--space-4);
+  min-height: 52px;
+  border: 1px solid transparent;
+  transition: border-color var(--duration-fast), box-shadow var(--duration-fast);
 }
 
-.inputWrap .input { background: transparent; }
+.inputWrap:focus-within {
+  border-color: rgba(186, 0, 54, 0.25);
+  box-shadow: 0 0 0 3px rgba(186, 0, 54, 0.08);
+  background: var(--color-surface-white);
+}
+
+.cardInput {
+  width: 100%;
+  min-width: 0;
+  flex: 1;
+  background: transparent;
+  border: none;
+  outline: none;
+  font-family: var(--font-body);
+  font-size: 16px; /* iOS zoom engeli */
+  color: var(--color-on-surface);
+  padding: 0.875rem 0;
+  letter-spacing: 0.02em;
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+.cardInput::placeholder {
+  color: rgba(91, 62, 65, 0.4);
+  letter-spacing: 0.04em;
+}
 
 .twoCol {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: var(--space-4);
+}
+
+@media (max-width: 380px) {
+  .twoCol {
+    grid-template-columns: 1fr;
+  }
 }
 
 .errorBox {
@@ -301,6 +372,22 @@
   top: calc(var(--nav-height) + var(--space-6));
 }
 
+@media (max-width: 1024px) {
+  .summary {
+    order: -1;
+  }
+
+  .summaryCard {
+    position: static;
+    padding: var(--space-5);
+  }
+
+  .summaryItem {
+    gap: var(--space-3);
+    flex-wrap: wrap;
+  }
+}
+
 .summaryTitle {
   font-family: var(--font-headline);
   font-size: var(--text-lg);
@@ -355,11 +442,35 @@
 .iyzicoBanner {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: var(--space-3);
   padding: var(--space-4);
   background: var(--color-on-surface);
   border-radius: var(--radius-lg);
-  margin-bottom: var(--space-6);
+  margin-bottom: 0;
+}
+
+@media (max-width: 640px) {
+  .iyzicoBanner {
+    padding: var(--space-3);
+  }
+
+  .header {
+    margin-bottom: var(--space-6);
+    padding: 0 var(--space-1);
+  }
+
+  .pageTitle {
+    font-size: 1.35rem;
+  }
+
+  .payBtn {
+    position: sticky;
+    bottom: var(--space-3);
+    z-index: 5;
+    box-shadow: 0 8px 24px rgba(186, 0, 54, 0.35);
+  }
 }
 
 .cardLogos {

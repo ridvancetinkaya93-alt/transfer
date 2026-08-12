@@ -12,6 +12,32 @@
   overflow: hidden;
 }
 
+@media (max-width: 768px) {
+  .hero {
+    min-height: auto;
+    align-items: flex-start;
+  }
+
+  .heroContent {
+    padding-top: var(--space-10);
+    padding-bottom: var(--space-12);
+    gap: var(--space-6);
+  }
+
+  .heroTitle {
+    font-size: clamp(2rem, 10vw, 2.75rem);
+  }
+
+  .heroDesc {
+    font-size: var(--text-base);
+  }
+
+  .heroBadge {
+    font-size: 0.65rem;
+    padding: 0.3rem 0.75rem;
+  }
+}
+
 .heroBg {
   position: absolute;
   inset: 0;

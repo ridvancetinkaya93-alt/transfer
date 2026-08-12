@@ -11,6 +11,33 @@ export function formatCardNumber(value: string): string {
   return digits.replace(/(\d{4})(?=\d)/g, '$1 ').trim();
 }
 
+/** Tek alanda MM/YY — mobilde iki ayrı input yazılmıyordu */
+export function formatExpiryInput(value: string): string {
+  let digits = value.replace(/\D/g, '').slice(0, 4);
+  if (digits.length >= 1) {
+    const first = Number(digits[0]);
+    if (first > 1) digits = `0${digits}`.slice(0, 4);
+  }
+  if (digits.length >= 2) {
+    const month = Number(digits.slice(0, 2));
+    if (month === 0) digits = `01${digits.slice(2)}`;
+    else if (month > 12) digits = `12${digits.slice(2)}`;
+  }
+  if (digits.length <= 2) return digits;
+  return `${digits.slice(0, 2)}/${digits.slice(2)}`;
+}
+
+export function parseExpiry(value: string): { month: string; year: string } {
+  const digits = value.replace(/\D/g, '').slice(0, 4);
+  return { month: digits.slice(0, 2), year: digits.slice(2, 4) };
+}
+
+export function expiryDisplay(month: string, year: string): string {
+  if (!month && !year) return '';
+  if (month.length < 2) return month;
+  return year ? `${month}/${year}` : `${month}/`;
+}
+
 export function detectCardBrand(number: string): 'visa' | 'mastercard' | 'unknown' {
   const digits = number.replace(/\D/g, '');
   if (digits.startsWith('4')) return 'visa';

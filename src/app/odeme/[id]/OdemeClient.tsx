@@ -8,6 +8,9 @@ import PaymentLogos from '@/components/ui/PaymentLogos';
 import {
   type CardFormValues,
   formatCardNumber,
+  formatExpiryInput,
+  parseExpiry,
+  expiryDisplay,
   detectCardBrand,
   maskCardNumber,
   validateCardForm,
@@ -133,13 +136,17 @@ export default function OdemeClient({ reservation }: Props) {
     loadCheckout();
   }, [cardsLoaded, selectedCardId, loadCheckout]);
 
-  const updateCardField = (field: keyof CardFormValues, value: string) => {
+  const updateCardField = (field: keyof CardFormValues | 'expiry', value: string) => {
     setCardForm(prev => {
       if (field === 'cardNumber') return { ...prev, cardNumber: formatCardNumber(value) };
-      if (field === 'expiryMonth') return { ...prev, expiryMonth: value.replace(/\D/g, '').slice(0, 2) };
-      if (field === 'expiryYear') return { ...prev, expiryYear: value.replace(/\D/g, '').slice(0, 2) };
+      if (field === 'expiry') {
+        const formatted = formatExpiryInput(value);
+        const { month, year } = parseExpiry(formatted);
+        return { ...prev, expiryMonth: month, expiryYear: year };
+      }
       if (field === 'cvv') return { ...prev, cvv: value.replace(/\D/g, '').slice(0, 4) };
-      return { ...prev, [field]: value };
+      if (field === 'cardHolder') return { ...prev, cardHolder: value };
+      return prev;
     });
   };
 
@@ -270,11 +277,7 @@ export default function OdemeClient({ reservation }: Props) {
                 <>
                   <p className={styles.formSectionTitle}>Kredi / Banka Kartı Bilgileri</p>
 
-                  <div
-                    className={styles.cardVisualWrap}
-                    onClick={() => setCvvFocused(prev => !prev)}
-                    role="presentation"
-                  >
+                  <div className={styles.cardVisualWrap} aria-hidden="true">
                     <div className={`${styles.cardVisual} ${cvvFocused ? styles.flipped : ''}`}>
                       <div className={styles.cardFront}>
                         <div className={styles.cardLogo}>
@@ -325,9 +328,10 @@ export default function OdemeClient({ reservation }: Props) {
                         <div className={styles.inputWrap}>
                           <input
                             id="cardHolder"
-                            className="input"
+                            className={styles.cardInput}
                             type="text"
                             autoComplete="cc-name"
+                            enterKeyHint="next"
                             placeholder="Ad Soyad"
                             value={cardForm.cardHolder}
                             onChange={e => updateCardField('cardHolder', e.target.value)}
@@ -341,11 +345,13 @@ export default function OdemeClient({ reservation }: Props) {
                           <span className="material-symbols-outlined" style={{ fontSize: '20px', color: 'var(--color-secondary)' }}>credit_card</span>
                           <input
                             id="cardNumber"
-                            className="input"
-                            type="text"
+                            className={styles.cardInput}
+                            type="tel"
                             inputMode="numeric"
                             autoComplete="cc-number"
+                            enterKeyHint="next"
                             placeholder="0000 0000 0000 0000"
+                            maxLength={19}
                             value={cardForm.cardNumber}
                             onChange={e => updateCardField('cardNumber', e.target.value)}
                           />
@@ -354,29 +360,20 @@ export default function OdemeClient({ reservation }: Props) {
 
                       <div className={styles.twoCol}>
                         <div className={styles.fieldGroup}>
-                          <label className={styles.fieldLabel} htmlFor="expiryMonth">Son Kullanma</label>
+                          <label className={styles.fieldLabel} htmlFor="expiry">Son Kullanma</label>
                           <div className={styles.inputWrap}>
                             <input
-                              id="expiryMonth"
-                              className="input"
-                              type="text"
+                              id="expiry"
+                              className={styles.cardInput}
+                              type="tel"
                               inputMode="numeric"
-                              autoComplete="cc-exp-month"
-                              placeholder="AA"
-                              value={cardForm.expiryMonth}
-                              onChange={e => updateCardField('expiryMonth', e.target.value)}
-                              aria-label="Son kullanma ayı"
-                            />
-                            <span style={{ color: 'var(--color-secondary)', fontWeight: 700 }}>/</span>
-                            <input
-                              className="input"
-                              type="text"
-                              inputMode="numeric"
-                              autoComplete="cc-exp-year"
-                              placeholder="YY"
-                              value={cardForm.expiryYear}
-                              onChange={e => updateCardField('expiryYear', e.target.value)}
-                              aria-label="Son kullanma yılı"
+                              autoComplete="cc-exp"
+                              enterKeyHint="next"
+                              placeholder="AA/YY"
+                              maxLength={5}
+                              value={expiryDisplay(cardForm.expiryMonth, cardForm.expiryYear)}
+                              onChange={e => updateCardField('expiry', e.target.value)}
+                              aria-label="Son kullanma tarihi Ay/Yıl"
                             />
                           </div>
                         </div>
@@ -386,11 +383,13 @@ export default function OdemeClient({ reservation }: Props) {
                           <div className={styles.inputWrap}>
                             <input
                               id="cvv"
-                              className="input"
-                              type="text"
+                              className={styles.cardInput}
+                              type="tel"
                               inputMode="numeric"
                               autoComplete="cc-csc"
-                              placeholder="•••"
+                              enterKeyHint="done"
+                              placeholder="000"
+                              maxLength={4}
                               value={cardForm.cvv}
                               onFocus={() => setCvvFocused(true)}
                               onBlur={() => setCvvFocused(false)}
