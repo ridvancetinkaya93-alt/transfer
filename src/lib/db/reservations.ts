@@ -5,6 +5,7 @@ import { getNightCount, generateReservationCode } from '@/lib/utils';
 import { requireSupabaseAdmin } from '@/lib/supabase/require';
 import { getExtrasMap } from '@/lib/db/extras';
 import { getBlockedDatesForVilla } from '@/lib/db/blocked-dates';
+import { DEMO_VILLA_ID, isDemoVillaSlug } from '@/lib/mock/demo-catalog';
 
 export interface CreateReservationInput {
   villaSlug: string;
@@ -128,6 +129,10 @@ export async function checkAvailability(
   checkOut: string,
   excludeReservationId?: string
 ): Promise<{ available: boolean; reason?: string }> {
+  if (villaId === DEMO_VILLA_ID) {
+    return { available: true };
+  }
+
   const start = new Date(checkIn);
   const end = new Date(checkOut);
   if (end <= start) {
@@ -170,7 +175,7 @@ export async function createReservation(input: CreateReservationInput): Promise<
   if (!villa) return { reservation: null as unknown as Reservation, error: 'Villa bulunamadı.' };
 
   const nights = getNightCount(input.checkIn, input.checkOut);
-  if (nights < villa.minNights) {
+  if (!isDemoVillaSlug(input.villaSlug) && nights < villa.minNights) {
     return {
       reservation: null as unknown as Reservation,
       error: `Bu villa için minimum ${villa.minNights} gece konaklama gereklidir.`,

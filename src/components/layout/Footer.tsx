@@ -12,6 +12,7 @@ const services = [
 
 const corporate = [
   { href: '/hakkimizda', label: 'Hakkımızda' },
+  { href: '/demo/odeme', label: 'Demo Ödeme (Test)' },
   { href: '/hakkimizda#gizlilik', label: 'Gizlilik Sözleşmesi' },
   { href: '/hakkimizda#kvkk', label: 'KVKK' },
   { href: '/hakkimizda#teslimat-iade', label: 'Teslimat ve İade' },

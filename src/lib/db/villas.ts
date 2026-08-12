@@ -1,5 +1,7 @@
 import type { Villa, Region, Review } from '@/types/database';
 import { requireSupabaseAdmin } from '@/lib/supabase/require';
+import { ensureDemoCatalog } from '@/lib/mock/ensure-demo-catalog';
+import { getDemoVilla } from '@/lib/mock/demo-catalog';
 
 export interface VillaFilters {
   region?: string;
@@ -76,52 +78,61 @@ async function applyAvailabilityFilter(
 }
 
 async function loadBaseVillas(): Promise<Villa[]> {
-  const supabase = requireSupabaseAdmin();
-  const { data, error } = await supabase.from('villas').select('*').eq('is_active', true);
+  await ensureDemoCatalog().catch(err => {
+    console.error('[Demo catalog]', err);
+  });
 
-  if (error) throw new Error(`Villa listesi alınamadı: ${error.message}`);
-  if (!data?.length) return [];
+  try {
+    const supabase = requireSupabaseAdmin();
+    const { data, error } = await supabase.from('villas').select('*').eq('is_active', true);
 
-  return Promise.all(
-    data.map(async row => {
-      const [images, amenities, features, rules] = await Promise.all([
-        supabase.from('villa_images').select('url').eq('villa_id', row.id).order('sort_order'),
-        supabase.from('villa_amenities').select('icon, name').eq('villa_id', row.id),
-        supabase.from('villa_features').select('name').eq('villa_id', row.id),
-        supabase.from('villa_rules').select('rule_text').eq('villa_id', row.id).order('sort_order'),
-      ]);
+    if (error) throw new Error(`Villa listesi alınamadı: ${error.message}`);
+    if (!data?.length) return [getDemoVilla()];
 
-      return {
-        id: row.id,
-        slug: row.slug,
-        name: row.name,
-        location: row.location,
-        region: row.region_slug,
-        shortDescription: row.short_description,
-        description: row.description,
-        pricePerNight: row.price_per_night,
-        cleaningFee: row.cleaning_fee,
-        serviceFee: row.service_fee,
-        rating: Number(row.rating),
-        reviewCount: row.review_count,
-        maxGuests: row.max_guests,
-        bedrooms: row.bedrooms,
-        bathrooms: row.bathrooms,
-        squareMeters: row.square_meters,
-        images: images.data?.map(i => i.url) || [],
-        features: features.data?.map(f => f.name) || [],
-        amenities: amenities.data || [],
-        rules: rules.data?.map(r => r.rule_text) || [],
-        coordinates: { lat: Number(row.coordinates_lat), lng: Number(row.coordinates_lng) },
-        isFeatured: row.is_featured,
-        isAvailable: true,
-        tags: row.tags || [],
-        checkInTime: row.check_in_time,
-        checkOutTime: row.check_out_time,
-        minNights: row.min_nights,
-      };
-    })
-  );
+    return Promise.all(
+      data.map(async row => {
+        const [images, amenities, features, rules] = await Promise.all([
+          supabase.from('villa_images').select('url').eq('villa_id', row.id).order('sort_order'),
+          supabase.from('villa_amenities').select('icon, name').eq('villa_id', row.id),
+          supabase.from('villa_features').select('name').eq('villa_id', row.id),
+          supabase.from('villa_rules').select('rule_text').eq('villa_id', row.id).order('sort_order'),
+        ]);
+
+        return {
+          id: row.id,
+          slug: row.slug,
+          name: row.name,
+          location: row.location,
+          region: row.region_slug,
+          shortDescription: row.short_description,
+          description: row.description,
+          pricePerNight: row.price_per_night,
+          cleaningFee: row.cleaning_fee,
+          serviceFee: row.service_fee,
+          rating: Number(row.rating),
+          reviewCount: row.review_count,
+          maxGuests: row.max_guests,
+          bedrooms: row.bedrooms,
+          bathrooms: row.bathrooms,
+          squareMeters: row.square_meters,
+          images: images.data?.map(i => i.url) || [],
+          features: features.data?.map(f => f.name) || [],
+          amenities: amenities.data || [],
+          rules: rules.data?.map(r => r.rule_text) || [],
+          coordinates: { lat: Number(row.coordinates_lat), lng: Number(row.coordinates_lng) },
+          isFeatured: row.is_featured,
+          isAvailable: true,
+          tags: row.tags || [],
+          checkInTime: row.check_in_time,
+          checkOutTime: row.check_out_time,
+          minNights: row.min_nights,
+        };
+      })
+    );
+  } catch (err) {
+    console.error('[Villas fallback]', err);
+    return [getDemoVilla()];
+  }
 }
 
 export async function getVillas(filters: VillaFilters = {}): Promise<Villa[]> {
@@ -146,44 +157,57 @@ export async function getFeaturedVillas(): Promise<Villa[]> {
 }
 
 export async function getRegions(): Promise<Region[]> {
-  const supabase = requireSupabaseAdmin();
-  const villas = await getVillas({});
-  const counts = villas.reduce<Record<string, number>>((acc, v) => {
-    acc[v.region] = (acc[v.region] || 0) + 1;
-    return acc;
-  }, {});
+  try {
+    const supabase = requireSupabaseAdmin();
+    const villas = await getVillas({});
+    const counts = villas.reduce<Record<string, number>>((acc, v) => {
+      acc[v.region] = (acc[v.region] || 0) + 1;
+      return acc;
+    }, {});
 
-  const { data, error } = await supabase.from('regions').select('*').order('sort_order');
-  if (error) throw new Error(`Bölgeler alınamadı: ${error.message}`);
+    const { data, error } = await supabase.from('regions').select('*').order('sort_order');
+    if (error) throw new Error(`Bölgeler alınamadı: ${error.message}`);
 
-  return (data || []).map(r => ({
-    id: r.slug,
-    name: r.name,
-    villaCount: counts[r.slug] ?? r.villa_count,
-    image: r.image_url,
-  }));
+    return (data || []).map(r => ({
+      id: r.slug,
+      name: r.name,
+      villaCount: counts[r.slug] ?? r.villa_count,
+      image: r.image_url,
+    }));
+  } catch {
+    return [{
+      id: 'fethiye',
+      name: 'Fethiye',
+      villaCount: 1,
+      image: '/og-image.svg',
+    }];
+  }
 }
 
 export async function getReviewsByVillaId(villaId: string): Promise<Review[]> {
-  const supabase = requireSupabaseAdmin();
-  const { data, error } = await supabase
-    .from('reviews')
-    .select('*')
-    .eq('villa_id', villaId)
-    .eq('is_published', true)
-    .order('created_at', { ascending: false });
+  try {
+    const supabase = requireSupabaseAdmin();
+    const { data, error } = await supabase
+      .from('reviews')
+      .select('*')
+      .eq('villa_id', villaId)
+      .eq('is_published', true)
+      .order('created_at', { ascending: false });
 
-  if (error) throw new Error(`Yorumlar alınamadı: ${error.message}`);
+    if (error) throw new Error(`Yorumlar alınamadı: ${error.message}`);
 
-  return (data || []).map(r => ({
-    id: r.id,
-    villaId: r.villa_id,
-    author: r.author,
-    avatar: r.avatar || '',
-    date: new Date(r.created_at).toLocaleDateString('tr-TR', { month: 'long', year: 'numeric' }),
-    rating: r.rating,
-    comment: r.comment,
-  }));
+    return (data || []).map(r => ({
+      id: r.id,
+      villaId: r.villa_id,
+      author: r.author,
+      avatar: r.avatar || '',
+      date: new Date(r.created_at).toLocaleDateString('tr-TR', { month: 'long', year: 'numeric' }),
+      rating: r.rating,
+      comment: r.comment,
+    }));
+  } catch {
+    return [];
+  }
 }
 
 export async function getAllReviews(): Promise<Review[]> {
