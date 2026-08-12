@@ -1,7 +1,7 @@
 import { randomUUID } from 'crypto';
 import type { TransferRequest } from '@/types/database';
-import { requireSupabaseAdmin } from '@/lib/supabase/require';
 import { generateReservationCode } from '@/lib/utils';
+import { useMockBackend } from '@/lib/app-mode';
 
 function generateTransferCode(): string {
   return 'TRF-' + generateReservationCode().replace('RCT-', '');
@@ -24,6 +24,27 @@ export async function createTransferRequest(input: {
   const id = randomUUID();
   const code = generateTransferCode();
   const createdAt = new Date().toISOString();
+
+  if (useMockBackend()) {
+    return {
+      id,
+      code,
+      type: input.type,
+      fromLocation: input.from,
+      toLocation: input.to,
+      date: input.date,
+      time: input.time,
+      passengers: input.passengers,
+      vehicleSlug: input.vehicle,
+      guestName: input.name,
+      guestPhone: input.phone,
+      notes: input.notes,
+      status: 'new',
+      createdAt,
+    };
+  }
+
+  const { requireSupabaseAdmin } = await import('@/lib/supabase/require');
   const supabase = requireSupabaseAdmin();
 
   const { error } = await supabase.from('transfer_requests').insert({
@@ -65,6 +86,9 @@ export async function createTransferRequest(input: {
 }
 
 export async function getAllTransferRequests(): Promise<TransferRequest[]> {
+  if (useMockBackend()) return [];
+
+  const { requireSupabaseAdmin } = await import('@/lib/supabase/require');
   const supabase = requireSupabaseAdmin();
   const { data, error } = await supabase
     .from('transfer_requests')
@@ -95,6 +119,9 @@ export async function updateTransferStatus(
   id: string,
   status: TransferRequest['status']
 ): Promise<TransferRequest | null> {
+  if (useMockBackend()) return null;
+
+  const { requireSupabaseAdmin } = await import('@/lib/supabase/require');
   const supabase = requireSupabaseAdmin();
   const { error } = await supabase.from('transfer_requests').update({ status }).eq('id', id);
   if (error) throw new Error(`Transfer durumu güncellenemedi: ${error.message}`);
@@ -104,6 +131,9 @@ export async function updateTransferStatus(
 }
 
 export async function getTransfersByCustomerId(customerId: string): Promise<TransferRequest[]> {
+  if (useMockBackend()) return [];
+
+  const { requireSupabaseAdmin } = await import('@/lib/supabase/require');
   const supabase = requireSupabaseAdmin();
   const { data, error } = await supabase
     .from('transfer_requests')

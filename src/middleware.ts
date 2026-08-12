@@ -1,9 +1,15 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
-import { createSupabaseMiddlewareClient } from '@/lib/supabase/middleware';
-import { isUserAdmin } from '@/lib/auth/admin-check';
+import { useMockBackend } from '@/lib/app-mode';
 
 export async function middleware(request: NextRequest) {
+  if (useMockBackend()) {
+    return NextResponse.next({ request });
+  }
+
+  const { createSupabaseMiddlewareClient } = await import('@/lib/supabase/middleware');
+  const { isUserAdmin } = await import('@/lib/auth/admin-check');
+
   let response = NextResponse.next({ request });
 
   const supabase = createSupabaseMiddlewareClient(request, response);

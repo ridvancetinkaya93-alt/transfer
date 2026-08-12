@@ -1,6 +1,6 @@
 import { randomUUID } from 'crypto';
 import { getSiteUrl } from '@/lib/supabase/config';
-import { isProduction } from '@/lib/site-config';
+import { isLivePaymentsEnabled } from '@/lib/app-mode';
 import { getReservationById, markReservationPaid } from '@/lib/db/reservations';
 import { sendReservationConfirmation } from '@/lib/email/send';
 import {
@@ -40,10 +40,7 @@ export async function initiatePayment(
     return { success: false, error: 'Bu rezervasyon zaten ödenmiş.' };
   }
 
-  if (!isIyzicoConfigured()) {
-    if (isProduction()) {
-      return { success: false, error: 'Ödeme sistemi yapılandırılmamış. Lütfen destek ile iletişime geçin.' };
-    }
+  if (!isIyzicoConfigured() || !isLivePaymentsEnabled()) {
     return {
       success: true,
       devMode: true,
@@ -184,8 +181,8 @@ export async function handlePaymentCallback(token: string): Promise<{
   reservationId?: string;
   error?: string;
 }> {
-  if (!isIyzicoConfigured()) {
-    return { success: false, error: 'iyzico yapılandırılmamış.' };
+  if (!isIyzicoConfigured() || !isLivePaymentsEnabled()) {
+    return { success: false, error: 'iyzico devre dışı (mock mod).' };
   }
 
   const baseUrl = process.env.IYZICO_BASE_URL || 'https://sandbox-api.iyzipay.com';

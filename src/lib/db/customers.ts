@@ -1,10 +1,22 @@
 import type { CustomerProfile, SavedCard } from '@/types/database';
-import { requireSupabaseAdmin } from '@/lib/supabase/require';
+import { useMockBackend } from '@/lib/app-mode';
 
 export async function updateCustomerProfile(
   userId: string,
   data: { firstName: string; lastName: string; phone?: string }
 ): Promise<CustomerProfile> {
+  if (useMockBackend()) {
+    return {
+      id: userId,
+      email: 'demo@rcetinkayaturizm.com',
+      firstName: data.firstName,
+      lastName: data.lastName,
+      phone: data.phone,
+      createdAt: new Date().toISOString(),
+    };
+  }
+
+  const { requireSupabaseAdmin } = await import('@/lib/supabase/require');
   const admin = requireSupabaseAdmin();
   const { data: row, error } = await admin
     .from('profiles')
@@ -31,6 +43,9 @@ export async function updateCustomerProfile(
 }
 
 export async function getSavedCards(customerId: string): Promise<SavedCard[]> {
+  if (useMockBackend()) return [];
+
+  const { requireSupabaseAdmin } = await import('@/lib/supabase/require');
   const admin = requireSupabaseAdmin();
   const { data, error } = await admin
     .from('saved_cards')
@@ -52,6 +67,9 @@ export async function getSavedCards(customerId: string): Promise<SavedCard[]> {
 }
 
 export async function deleteSavedCard(customerId: string, cardId: string): Promise<void> {
+  if (useMockBackend()) return;
+
+  const { requireSupabaseAdmin } = await import('@/lib/supabase/require');
   const admin = requireSupabaseAdmin();
 
   const { data: card } = await admin
@@ -82,6 +100,9 @@ export async function deleteSavedCard(customerId: string, cardId: string): Promi
 }
 
 export async function getIyzicoCardUserKey(customerId: string): Promise<string | null> {
+  if (useMockBackend()) return null;
+
+  const { requireSupabaseAdmin } = await import('@/lib/supabase/require');
   const admin = requireSupabaseAdmin();
   const { data } = await admin
     .from('profiles')
@@ -93,6 +114,9 @@ export async function getIyzicoCardUserKey(customerId: string): Promise<string |
 }
 
 export async function setIyzicoCardUserKey(customerId: string, cardUserKey: string): Promise<void> {
+  if (useMockBackend()) return;
+
+  const { requireSupabaseAdmin } = await import('@/lib/supabase/require');
   const admin = requireSupabaseAdmin();
   await admin
     .from('profiles')
@@ -111,6 +135,18 @@ export async function addSavedCard(
     isDefault?: boolean;
   }
 ): Promise<SavedCard> {
+  if (useMockBackend()) {
+    return {
+      id: 'mock-card',
+      cardAlias: card.cardAlias,
+      cardBrand: card.cardBrand,
+      lastFour: card.lastFour,
+      isDefault: true,
+      createdAt: new Date().toISOString(),
+    };
+  }
+
+  const { requireSupabaseAdmin } = await import('@/lib/supabase/require');
   const admin = requireSupabaseAdmin();
 
   await setIyzicoCardUserKey(customerId, card.cardUserKey);
@@ -156,6 +192,9 @@ export async function addSavedCard(
 }
 
 export async function getSavedCardById(customerId: string, cardId: string) {
+  if (useMockBackend()) return null;
+
+  const { requireSupabaseAdmin } = await import('@/lib/supabase/require');
   const admin = requireSupabaseAdmin();
   const { data } = await admin
     .from('saved_cards')
@@ -178,6 +217,18 @@ export async function getSavedCardById(customerId: string, cardId: string) {
 }
 
 export async function getCustomerStats(customerId: string, email: string) {
+  if (useMockBackend()) {
+    return {
+      totalReservations: 0,
+      activeReservations: 0,
+      paidReservations: 0,
+      totalTransfers: 0,
+      activeTransfers: 0,
+      savedCards: 0,
+    };
+  }
+
+  const { requireSupabaseAdmin } = await import('@/lib/supabase/require');
   const admin = requireSupabaseAdmin();
 
   const [reservations, transfers, cards] = await Promise.all([

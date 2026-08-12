@@ -2,10 +2,11 @@ import { randomUUID } from 'crypto';
 import type { Reservation, ReservationStatus, PaymentStatus, TimelineItem } from '@/types/database';
 import { getVillaBySlug, getVillaById } from '@/lib/db/villas';
 import { getNightCount, generateReservationCode } from '@/lib/utils';
-import { requireSupabaseAdmin } from '@/lib/supabase/require';
 import { getExtrasMap } from '@/lib/db/extras';
 import { getBlockedDatesForVilla } from '@/lib/db/blocked-dates';
 import { DEMO_VILLA_ID, isDemoVillaSlug } from '@/lib/mock/demo-catalog';
+import { useMockBackend } from '@/lib/app-mode';
+import * as mockReservations from '@/lib/mock/reservations-store';
 
 export interface CreateReservationInput {
   villaSlug: string;
@@ -129,6 +130,10 @@ export async function checkAvailability(
   checkOut: string,
   excludeReservationId?: string
 ): Promise<{ available: boolean; reason?: string }> {
+  if (useMockBackend()) {
+    return mockReservations.mockCheckAvailability(villaId, checkIn, checkOut, excludeReservationId);
+  }
+
   if (villaId === DEMO_VILLA_ID) {
     return { available: true };
   }
@@ -156,6 +161,9 @@ export async function checkAvailability(
 }
 
 async function getReservationsForVilla(villaId: string): Promise<StoredReservation[]> {
+  if (useMockBackend()) return mockReservations.mockGetReservationsForVilla(villaId);
+
+  const { requireSupabaseAdmin } = await import('@/lib/supabase/require');
   const supabase = requireSupabaseAdmin();
   const { data, error } = await supabase
     .from('reservations')
@@ -171,6 +179,8 @@ export async function createReservation(input: CreateReservationInput): Promise<
   reservation: Reservation;
   error?: string;
 }> {
+  if (useMockBackend()) return mockReservations.mockCreateReservation(input);
+
   const villa = await getVillaBySlug(input.villaSlug);
   if (!villa) return { reservation: null as unknown as Reservation, error: 'Villa bulunamadı.' };
 
@@ -201,6 +211,7 @@ export async function createReservation(input: CreateReservationInput): Promise<
   const code = generateReservationCode();
   const id = randomUUID();
   const now = new Date().toISOString();
+  const { requireSupabaseAdmin } = await import('@/lib/supabase/require');
   const supabase = requireSupabaseAdmin();
 
   const { error } = await supabase.from('reservations').insert({
@@ -281,6 +292,9 @@ export async function createReservation(input: CreateReservationInput): Promise<
 }
 
 export async function getReservationById(id: string): Promise<Reservation | null> {
+  if (useMockBackend()) return mockReservations.mockGetReservationById(id);
+
+  const { requireSupabaseAdmin } = await import('@/lib/supabase/require');
   const supabase = requireSupabaseAdmin();
   const { data, error } = await supabase.from('reservations').select('*').eq('id', id).single();
 
@@ -290,8 +304,11 @@ export async function getReservationById(id: string): Promise<Reservation | null
 }
 
 export async function lookupReservation(code: string, email: string): Promise<Reservation | null> {
+  if (useMockBackend()) return mockReservations.mockLookupReservation(code, email);
+
   const normalizedCode = code.toUpperCase().trim();
   const normalizedEmail = email.toLowerCase().trim();
+  const { requireSupabaseAdmin } = await import('@/lib/supabase/require');
   const supabase = requireSupabaseAdmin();
 
   const { data, error } = await supabase
@@ -311,6 +328,11 @@ export async function markReservationPaid(
   paymentId: string,
   paymentMethod = 'Kredi Kartı'
 ): Promise<Reservation | null> {
+  if (useMockBackend()) {
+    return mockReservations.mockMarkReservationPaid(reservationId, paymentId, paymentMethod);
+  }
+
+  const { requireSupabaseAdmin } = await import('@/lib/supabase/require');
   const supabase = requireSupabaseAdmin();
   const { error } = await supabase
     .from('reservations')
@@ -337,6 +359,9 @@ export async function updateReservationStatus(
   id: string,
   status: ReservationStatus
 ): Promise<Reservation | null> {
+  if (useMockBackend()) return mockReservations.mockUpdateReservationStatus(id, status);
+
+  const { requireSupabaseAdmin } = await import('@/lib/supabase/require');
   const supabase = requireSupabaseAdmin();
   const { error } = await supabase
     .from('reservations')
@@ -354,6 +379,9 @@ export async function updateReservationStatus(
 }
 
 export async function getAllReservations(): Promise<Reservation[]> {
+  if (useMockBackend()) return mockReservations.mockGetAllReservations();
+
+  const { requireSupabaseAdmin } = await import('@/lib/supabase/require');
   const supabase = requireSupabaseAdmin();
   const { data, error } = await supabase
     .from('reservations')
@@ -381,6 +409,8 @@ export async function getReservationForPayment(
 }
 
 export async function getBlockedDates(villaId: string): Promise<string[]> {
+  if (useMockBackend()) return mockReservations.mockGetBlockedDates(villaId);
+
   const reservations = await getReservationsForVilla(villaId);
   const dates = new Set<string>();
 
@@ -400,6 +430,9 @@ export async function getBlockedDates(villaId: string): Promise<string[]> {
 }
 
 export async function getReservationsByCustomerId(customerId: string): Promise<Reservation[]> {
+  if (useMockBackend()) return mockReservations.mockGetReservationsByCustomerId(customerId);
+
+  const { requireSupabaseAdmin } = await import('@/lib/supabase/require');
   const supabase = requireSupabaseAdmin();
   const { data, error } = await supabase
     .from('reservations')
@@ -419,6 +452,11 @@ export async function getReservationForCustomer(
   customerId: string,
   reservationId: string
 ): Promise<Reservation | null> {
+  if (useMockBackend()) {
+    return mockReservations.mockGetReservationForCustomer(customerId, reservationId);
+  }
+
+  const { requireSupabaseAdmin } = await import('@/lib/supabase/require');
   const supabase = requireSupabaseAdmin();
   const { data, error } = await supabase
     .from('reservations')

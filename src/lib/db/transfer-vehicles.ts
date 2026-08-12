@@ -1,4 +1,5 @@
-import { requireSupabaseAdmin } from '@/lib/supabase/require';
+import { useMockBackend } from '@/lib/app-mode';
+import { mockTransferVehicles } from '@/lib/mock/catalog-data';
 
 export interface TransferVehicle {
   id: string;
@@ -16,6 +17,9 @@ export interface TransferVehicle {
 }
 
 export async function getTransferVehicles(): Promise<TransferVehicle[]> {
+  if (useMockBackend()) return mockTransferVehicles;
+
+  const { requireSupabaseAdmin } = await import('@/lib/supabase/require');
   const supabase = requireSupabaseAdmin();
   const { data, error } = await supabase
     .from('transfer_vehicles')

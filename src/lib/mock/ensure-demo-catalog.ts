@@ -1,26 +1,21 @@
-import type { SupabaseClient } from '@supabase/supabase-js';
-import { requireSupabaseAdmin } from '@/lib/supabase/require';
-import {
-  DEMO_REGION_SLUG,
-  DEMO_VILLA_ID,
-  DEMO_VILLA_SLUG,
-  demoVillaDefinition,
-} from '@/lib/mock/demo-catalog';
+import { useMockBackend } from '@/lib/app-mode';
 
-let cachedEnsure: Promise<string> | null = null;
-
-/** Demo villa her zaman Supabase'de mevcut olsun (banka testi). */
+/** Mock modda Supabase'e yazma — no-op. */
 export async function ensureDemoCatalog(): Promise<string> {
-  if (!cachedEnsure) {
-    cachedEnsure = upsertDemoCatalog(requireSupabaseAdmin()).catch(err => {
-      cachedEnsure = null;
-      throw err;
-    });
+  if (useMockBackend()) {
+    const { DEMO_VILLA_ID } = await import('@/lib/mock/demo-catalog');
+    return DEMO_VILLA_ID;
   }
-  return cachedEnsure;
-}
 
-async function upsertDemoCatalog(supabase: SupabaseClient): Promise<string> {
+  const { requireSupabaseAdmin } = await import('@/lib/supabase/require');
+  const {
+    DEMO_REGION_SLUG,
+    DEMO_VILLA_ID,
+    DEMO_VILLA_SLUG,
+    demoVillaDefinition,
+  } = await import('@/lib/mock/demo-catalog');
+  const supabase = requireSupabaseAdmin();
+
   const { error: regionError } = await supabase.from('regions').upsert(
     {
       slug: DEMO_REGION_SLUG,
@@ -65,32 +60,12 @@ async function upsertDemoCatalog(supabase: SupabaseClient): Promise<string> {
   if (villaError) throw new Error(`Demo villa eklenemedi: ${villaError.message}`);
 
   await supabase.from('villa_images').delete().eq('villa_id', DEMO_VILLA_ID);
-  const { error: imageError } = await supabase.from('villa_images').insert({
+  await supabase.from('villa_images').insert({
     villa_id: DEMO_VILLA_ID,
     url: demoVillaDefinition.images[0],
     sort_order: 0,
     is_primary: true,
   });
-  if (imageError) throw new Error(`Demo villa görseli eklenemedi: ${imageError.message}`);
-
-  await supabase.from('villa_amenities').delete().eq('villa_id', DEMO_VILLA_ID);
-  const { error: amenityError } = await supabase.from('villa_amenities').insert(
-    demoVillaDefinition.amenities.map(item => ({
-      villa_id: DEMO_VILLA_ID,
-      icon: item.icon,
-      name: item.name,
-    }))
-  );
-  if (amenityError) throw new Error(`Demo villa özellikleri eklenemedi: ${amenityError.message}`);
-
-  await supabase.from('villa_features').delete().eq('villa_id', DEMO_VILLA_ID);
-  const { error: featureError } = await supabase.from('villa_features').insert(
-    demoVillaDefinition.features.map(name => ({
-      villa_id: DEMO_VILLA_ID,
-      name,
-    }))
-  );
-  if (featureError) throw new Error(`Demo villa etiketleri eklenemedi: ${featureError.message}`);
 
   return DEMO_VILLA_ID;
 }

@@ -1,8 +1,10 @@
 import type { CustomerProfile } from '@/types/database';
-import { createSupabaseServerClient } from '@/lib/supabase/ssr-server';
-import { requireSupabaseAdmin } from '@/lib/supabase/require';
+import { useMockBackend } from '@/lib/app-mode';
 
 export async function getAuthenticatedUser() {
+  if (useMockBackend()) return null;
+
+  const { createSupabaseServerClient } = await import('@/lib/supabase/ssr-server');
   const supabase = await createSupabaseServerClient();
   const { data: { user }, error } = await supabase.auth.getUser();
   if (error || !user) return null;
@@ -10,6 +12,9 @@ export async function getAuthenticatedUser() {
 }
 
 export async function getCustomerProfile(userId: string): Promise<CustomerProfile | null> {
+  if (useMockBackend()) return null;
+
+  const { requireSupabaseAdmin } = await import('@/lib/supabase/require');
   const admin = requireSupabaseAdmin();
   const { data, error } = await admin.from('profiles').select('*').eq('id', userId).single();
   if (error || !data) return null;
@@ -35,6 +40,9 @@ export async function requireCustomer(): Promise<{ userId: string; profile: Cust
 }
 
 export async function linkPastRecordsToCustomer(userId: string, email: string, phone?: string) {
+  if (useMockBackend()) return;
+
+  const { requireSupabaseAdmin } = await import('@/lib/supabase/require');
   const admin = requireSupabaseAdmin();
   const normalizedEmail = email.toLowerCase().trim();
 

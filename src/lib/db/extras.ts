@@ -1,4 +1,5 @@
-import { requireSupabaseAdmin } from '@/lib/supabase/require';
+import { useMockBackend } from '@/lib/app-mode';
+import { mockBookingExtras } from '@/lib/mock/catalog-data';
 
 export interface BookingExtra {
   id: string;
@@ -10,6 +11,9 @@ export interface BookingExtra {
 }
 
 export async function getBookingExtras(): Promise<BookingExtra[]> {
+  if (useMockBackend()) return mockBookingExtras;
+
+  const { requireSupabaseAdmin } = await import('@/lib/supabase/require');
   const supabase = requireSupabaseAdmin();
   const { data, error } = await supabase
     .from('extras')

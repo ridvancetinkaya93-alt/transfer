@@ -1,11 +1,9 @@
 import { NextResponse } from 'next/server';
-import { ensureDemoCatalog } from '@/lib/mock/ensure-demo-catalog';
 import { DEMO_GUEST, DEMO_VILLA_SLUG, getDemoCheckInOut } from '@/lib/mock/demo-catalog';
 import { createReservation } from '@/lib/db/reservations';
 
 export async function POST() {
   try {
-    await ensureDemoCatalog();
     const { checkIn, checkOut } = getDemoCheckInOut();
 
     const { reservation, error } = await createReservation({

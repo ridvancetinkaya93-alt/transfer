@@ -1,6 +1,6 @@
 import { randomUUID } from 'crypto';
 import type { ContactMessage } from '@/types/database';
-import { requireSupabaseAdmin } from '@/lib/supabase/require';
+import { useMockBackend } from '@/lib/app-mode';
 
 export async function createContactMessage(input: {
   name: string;
@@ -11,6 +11,12 @@ export async function createContactMessage(input: {
 }): Promise<ContactMessage> {
   const id = randomUUID();
   const createdAt = new Date().toISOString();
+
+  if (useMockBackend()) {
+    return { id, ...input, createdAt };
+  }
+
+  const { requireSupabaseAdmin } = await import('@/lib/supabase/require');
   const supabase = requireSupabaseAdmin();
 
   const { error } = await supabase.from('contact_messages').insert({
@@ -28,6 +34,9 @@ export async function createContactMessage(input: {
 }
 
 export async function getAllContactMessages(): Promise<ContactMessage[]> {
+  if (useMockBackend()) return [];
+
+  const { requireSupabaseAdmin } = await import('@/lib/supabase/require');
   const supabase = requireSupabaseAdmin();
   const { data, error } = await supabase
     .from('contact_messages')

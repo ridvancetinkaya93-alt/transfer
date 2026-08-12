@@ -1,7 +1,6 @@
 import type { Villa, Region, Review } from '@/types/database';
-import { requireSupabaseAdmin } from '@/lib/supabase/require';
-import { ensureDemoCatalog } from '@/lib/mock/ensure-demo-catalog';
-import { getDemoVilla } from '@/lib/mock/demo-catalog';
+import { useMockBackend } from '@/lib/app-mode';
+import { mockRegions, mockVillas } from '@/lib/mock/catalog-data';
 
 export interface VillaFilters {
   region?: string;
@@ -20,29 +19,15 @@ export interface VillaFilters {
 function applyFilters(villaList: Villa[], filters: VillaFilters): Villa[] {
   let result = [...villaList];
 
-  if (filters.region) {
-    result = result.filter(v => v.region === filters.region);
-  }
-  if (filters.guests && filters.guests > 0) {
-    result = result.filter(v => v.maxGuests >= filters.guests!);
-  }
-  if (filters.minPrice && filters.minPrice > 0) {
-    result = result.filter(v => v.pricePerNight >= filters.minPrice!);
-  }
-  if (filters.maxPrice && filters.maxPrice < 25000) {
-    result = result.filter(v => v.pricePerNight <= filters.maxPrice!);
-  }
-  if (filters.hasPool) {
-    result = result.filter(v => v.amenities.some(a => a.icon === 'pool'));
-  }
+  if (filters.region) result = result.filter(v => v.region === filters.region);
+  if (filters.guests && filters.guests > 0) result = result.filter(v => v.maxGuests >= filters.guests!);
+  if (filters.minPrice && filters.minPrice > 0) result = result.filter(v => v.pricePerNight >= filters.minPrice!);
+  if (filters.maxPrice && filters.maxPrice < 25000) result = result.filter(v => v.pricePerNight <= filters.maxPrice!);
+  if (filters.hasPool) result = result.filter(v => v.amenities.some(a => a.icon === 'pool'));
   if (filters.hasSeaView) {
-    result = result.filter(v =>
-      v.features.some(f => f.toLowerCase().includes('deniz'))
-    );
+    result = result.filter(v => v.features.some(f => f.toLowerCase().includes('deniz')));
   }
-  if (filters.featured) {
-    result = result.filter(v => v.isFeatured);
-  }
+  if (filters.featured) result = result.filter(v => v.isFeatured);
   if (filters.feature === 'yat') {
     result = result.filter(v =>
       v.tags.some(t => t.toLowerCase().includes('yat')) ||
@@ -78,15 +63,18 @@ async function applyAvailabilityFilter(
 }
 
 async function loadBaseVillas(): Promise<Villa[]> {
-  await ensureDemoCatalog().catch(err => {
-    console.error('[Demo catalog]', err);
-  });
+  if (useMockBackend()) return mockVillas;
+
+  const { requireSupabaseAdmin } = await import('@/lib/supabase/require');
+  const { ensureDemoCatalog } = await import('@/lib/mock/ensure-demo-catalog');
+  const { getDemoVilla } = await import('@/lib/mock/demo-catalog');
+
+  await ensureDemoCatalog().catch(err => console.error('[Demo catalog]', err));
 
   try {
     const supabase = requireSupabaseAdmin();
     const { data, error } = await supabase.from('villas').select('*').eq('is_active', true);
-
-    if (error) throw new Error(`Villa listesi alınamadı: ${error.message}`);
+    if (error) throw error;
     if (!data?.length) return [getDemoVilla()];
 
     return Promise.all(
@@ -131,7 +119,7 @@ async function loadBaseVillas(): Promise<Villa[]> {
     );
   } catch (err) {
     console.error('[Villas fallback]', err);
-    return [getDemoVilla()];
+    return mockVillas;
   }
 }
 
@@ -157,7 +145,10 @@ export async function getFeaturedVillas(): Promise<Villa[]> {
 }
 
 export async function getRegions(): Promise<Region[]> {
+  if (useMockBackend()) return mockRegions;
+
   try {
+    const { requireSupabaseAdmin } = await import('@/lib/supabase/require');
     const supabase = requireSupabaseAdmin();
     const villas = await getVillas({});
     const counts = villas.reduce<Record<string, number>>((acc, v) => {
@@ -166,7 +157,7 @@ export async function getRegions(): Promise<Region[]> {
     }, {});
 
     const { data, error } = await supabase.from('regions').select('*').order('sort_order');
-    if (error) throw new Error(`Bölgeler alınamadı: ${error.message}`);
+    if (error) throw error;
 
     return (data || []).map(r => ({
       id: r.slug,
@@ -175,45 +166,16 @@ export async function getRegions(): Promise<Region[]> {
       image: r.image_url,
     }));
   } catch {
-    return [{
-      id: 'fethiye',
-      name: 'Fethiye',
-      villaCount: 1,
-      image: '/og-image.svg',
-    }];
+    return mockRegions;
   }
 }
 
-export async function getReviewsByVillaId(villaId: string): Promise<Review[]> {
-  try {
-    const supabase = requireSupabaseAdmin();
-    const { data, error } = await supabase
-      .from('reviews')
-      .select('*')
-      .eq('villa_id', villaId)
-      .eq('is_published', true)
-      .order('created_at', { ascending: false });
-
-    if (error) throw new Error(`Yorumlar alınamadı: ${error.message}`);
-
-    return (data || []).map(r => ({
-      id: r.id,
-      villaId: r.villa_id,
-      author: r.author,
-      avatar: r.avatar || '',
-      date: new Date(r.created_at).toLocaleDateString('tr-TR', { month: 'long', year: 'numeric' }),
-      rating: r.rating,
-      comment: r.comment,
-    }));
-  } catch {
-    return [];
-  }
+export async function getReviewsByVillaId(_villaId: string): Promise<Review[]> {
+  return [];
 }
 
 export async function getAllReviews(): Promise<Review[]> {
-  const villas = await getVillas({});
-  const all = await Promise.all(villas.map(v => getReviewsByVillaId(v.id)));
-  return all.flat().slice(0, 12);
+  return [];
 }
 
 export async function getSiteStats(): Promise<{
@@ -223,7 +185,6 @@ export async function getSiteStats(): Promise<{
   reviewCount: number;
 }> {
   const villas = await getVillas({});
-  const reviews = await getAllReviews();
   const regions = await getRegions();
   const avgRating =
     villas.length > 0
@@ -234,7 +195,7 @@ export async function getSiteStats(): Promise<{
     villaCount: villas.length,
     regionCount: regions.length,
     avgRating,
-    reviewCount: reviews.length + villas.reduce((s, v) => s + v.reviewCount, 0),
+    reviewCount: villas.reduce((s, v) => s + v.reviewCount, 0),
   };
 }
 

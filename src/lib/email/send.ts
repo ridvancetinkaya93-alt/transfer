@@ -7,12 +7,18 @@ import {
   transferAdminTemplate,
   transferCustomerTemplate,
 } from '@/lib/email/templates';
+import { isLiveEmailEnabled } from '@/lib/app-mode';
 
 export async function sendEmail(options: {
   to: string;
   subject: string;
   html: string;
 }): Promise<boolean> {
+  if (!isLiveEmailEnabled()) {
+    console.log('[Email Mock]', options.to, options.subject);
+    return true;
+  }
+
   const apiKey = process.env.RESEND_API_KEY;
   const from = process.env.EMAIL_FROM || 'RCetinkaya Turizm <noreply@rcetinkayaturizm.com>';
 
